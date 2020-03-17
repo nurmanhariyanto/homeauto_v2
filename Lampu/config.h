@@ -38,13 +38,13 @@ char mqtt_keywords2[40] = "absensimachine/control";*/
 // HOME
 //char wifi_ssid[34] = "Automation";
 //char wifi_password[34] = "1234567890";
-char wifi_ssid[34] = "IotPertanian";
-char wifi_password[34] = "kacafilm";
+char wifi_ssid[34] = "LSKK_AP3";
+char wifi_password[34] = "lskk@Ppejuang";
 char mqtt_server[40] ="167.205.7.226";
 int mqtt_port = 1883;
 char smqtt_port[5] = "1883";
-char mqtt_user[40] = "/iotpertanian:iot_pertanian";
-char mqtt_password[40] = "iotpertanian";
+char mqtt_user[40] = "/homeauto:homeauto";
+char mqtt_password[40] = "homeauto12345!";
 //char mqtt_keywords1[40] = "sva.publish"; //publish
 //char mqtt_keywords2[40] = "sva.subscribe"; //subcribe
 /*char wifi_ssid[34] = "HUAWEI-E5577-33CC";

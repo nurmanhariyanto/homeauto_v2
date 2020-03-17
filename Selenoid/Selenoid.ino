@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include <SoftwareSerial.h>
-#include <EasyNTPClient.h>
+//#include <EasyNTPClient.h>
 #include <WiFiUdp.h>
 //#include <NTPClient.h>
 #include <FS.h> //this needs to be first, or it all crashes and burns...
@@ -16,8 +16,8 @@
 #include "config.h"
 //WiFiClient espClient;
 //PubSubClient client(espClient);
-WiFiUDP udp;
-EasyNTPClient ntpClient(udp, "pool.ntp.org", 25200); 
+//WiFiUDP udp;
+//EasyNTPClient ntpClient(udp, "pool.ntp.org", 25200); 
 StaticJsonBuffer<200> jsonBuffer;
 int relayPin = D5 ;
 void setup_wifi() {

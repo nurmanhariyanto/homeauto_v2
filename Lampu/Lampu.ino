@@ -1,7 +1,7 @@
 /*
-    Develop by      : 
+    Develop by      :
     Email           :
-    Project         : 
+    Project         :
     Version         :
 */
 //library
@@ -31,7 +31,7 @@
 #include "config.h"
 #include <EEPROM.h>
 StaticJsonBuffer<200> jsonBuffer;
-void writeString(char add,String data);
+void writeString(char add, String data);
 String read_String(char add);
 //const char* id_user,aktif;
 
@@ -43,17 +43,18 @@ int soilSensor = A0;
 int powerPin = 15;
 
 //char devicename[40]="";
-char registerstatus[40]="";
-char aktivasistatus[40]="";
+char registerstatus[40] = "";
+char aktivasistatus[40] = "";
 //var untuk userID
-String commandMessage1 = "1"; //message pesan subscribe
-String commandMessage2 = "2"; //message pesan publish
-String typeDevice = "Soil Sensor";
-char routingkey2[40] ="publish";
+char routingkey2[40] = "feedback_device";
 int relay1 = D1 ;
 int relay2 = D2 ;
 int relay3 = D3 ;
 int relay4 = D4 ;
+int relay5 = D5 ;
+int relay6 = D6 ;
+int relay7 = D7 ;
+int relay8 = D8 ;
 void setup_wifi() {
   WiFi.macAddress(MAC_array);
   for (int i = 0; i < sizeof(MAC_array) - 1; ++i) {
@@ -101,7 +102,7 @@ void callback(char * topic, byte * payload, unsigned int length) {
   String data = convertMsg.substring(5);
   int timer = data.toInt();
   Serial.println(message);
-     
+
   //relay 1
   if (message[0] == '1') {
     digitalWrite(relay1, HIGH);
@@ -114,33 +115,77 @@ void callback(char * topic, byte * payload, unsigned int length) {
   if (message[1] == '1') {
     digitalWrite(relay2, HIGH);
     Serial.println("relay 2 mati");
-//    publish_ulang();
+    //    publish_ulang();
   } else {
     digitalWrite(relay2, LOW);
     Serial.println("relay 2 idup");
-//    publish_ulang();
+    //    publish_ulang();
   }
 
   //relay 3
   if (message[2] == '1') {
     digitalWrite(relay3, HIGH);
     Serial.println("relay 3 mati");
-//    publish_ulang();
+    //    publish_ulang();
   } else {
     digitalWrite(relay3, LOW);
     Serial.println("relay 3 idup");
-//    publish_ulang();
+    //    publish_ulang();
   }
 
   //relay 4
   if (message[3] == '1') {
     digitalWrite(relay4, HIGH);
     Serial.println("relay 4 mati");
-//    publish_ulang();
+    //    publish_ulang();
   } else {
     digitalWrite(relay4, LOW);
     Serial.println("relay 4 idup");
-//    publish_ulang();
+    //    publish_ulang();
+  }
+
+
+
+
+  //relay 5
+  if (message[4] == '1') {
+    digitalWrite(relay5, HIGH);
+    Serial.println("relay 5 mati");
+  } else {
+    digitalWrite(relay5, LOW);
+    Serial.println("relay 5 idup");
+  }
+  //relay 6
+  if (message[5] == '1') {
+    digitalWrite(relay6, HIGH);
+    Serial.println("relay 6 mati");
+    //    publish_ulang();
+  } else {
+    digitalWrite(relay6, LOW);
+    Serial.println("relay 6 idup");
+    //    publish_ulang();
+  }
+
+  //relay 7
+  if (message[6] == '1') {
+    digitalWrite(relay7, HIGH);
+    Serial.println("relay 7 mati");
+    //    publish_ulang();
+  } else {
+    digitalWrite(relay7, LOW);
+    Serial.println("relay 7 idup");
+    //    publish_ulang();
+  }
+
+  //relay 8
+  if (message[7] == '1') {
+    digitalWrite(relay8, HIGH);
+    Serial.println("relay 7 mati");
+    //    publish_ulang();
+  } else {
+    digitalWrite(relay8, LOW);
+    Serial.println("relay 7 idup");
+    //    publish_ulang();
   }
 
   delay (timer);
@@ -148,15 +193,19 @@ void callback(char * topic, byte * payload, unsigned int length) {
   digitalWrite(relay2, HIGH);
   digitalWrite(relay3, HIGH);
   digitalWrite(relay4, HIGH);
+  digitalWrite(relay5, HIGH);
+  digitalWrite(relay6, HIGH);
+  digitalWrite(relay7, HIGH);
+  digitalWrite(relay8, HIGH);
   Serial.println("relay mati");
-   //  publish_ulang();
-if (message >=0){
-      publish_ulang();
-     }else{
-      Serial.println("0");
-      } 
-  
- }
+  //  publish_ulang();
+  if (message >= 0) {
+    publish_ulang();
+  } else {
+    Serial.println("0");
+  }
+
+}
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -167,7 +216,7 @@ void reconnect() {
       Serial.println("connected");
       Serial.println(MAC_char);
       client.subscribe(MAC_char);
-     
+
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -188,8 +237,12 @@ void setup() {
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
+  pinMode(D5, OUTPUT);
+  pinMode(D6, OUTPUT);
+  pinMode(D7, OUTPUT);
+  pinMode(D8, OUTPUT);
   pinMode(powerPin, OUTPUT);
-  digitalWrite(D1, HIGH);
+    digitalWrite(D1, HIGH);
   digitalWrite(D2, HIGH);
   digitalWrite(D3, HIGH);
   digitalWrite(D4, HIGH);
@@ -203,90 +256,72 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(aktivasi);
 
-  
+
 }
 
 void loop() {
   String  recivedData = read_String(10);
-   Serial.println("Ini datanya:");
+  Serial.println("Ini datanya:");
   Serial.println(recivedData);
   delay(1000);
-//  int pesan=1;
-  if(recivedData=="1"){
+  //  int pesan=1;
+  if (recivedData == "1") {
     client.setCallback(callback);
-     client.loop(); 
-  }else{
-     client.setCallback(aktivasi);
-     client.loop(); 
-    Serial.println("Device Belum Teraktivasi");  
-    }
-     if (!client.connected()) {
+    client.loop();
+  } else {
+    client.setCallback(aktivasi);
+    client.loop();
+    Serial.println("Device Belum Teraktivasi");
+  }
+  if (!client.connected()) {
     reconnect();
   }
 }
 
 
-void publish_ulang (){
+void publish_ulang () {
 
-//const char tambahan=MAC_char,"Ast";
+  //const char tambahan=MAC_char,"Ast";
   String berhasil = "berhasil";
   String pubmsg = "";
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root["mac"] = MAC_char;
-//  root["waktu siram"] =timer;
-  root["pesan"] =berhasil;
+  //  root["waktu siram"] =timer;
+  root["pesan"] = berhasil;
   root.printTo(pubmsg);
   Serial.println(pubmsg);
   Serial.println(MAC_char);
-  client.publish(routingkey2 ,pubmsg.c_str());
-//client.publish(tambahan());
+  client.publish(routingkey2 , pubmsg.c_str());
+  //client.publish(tambahan());
   delay(3000);
-  }
-
-  
-
-//void publish_rmq(){
-  //String pubmsg = "";
-  //StaticJsonBuffer<200> jsonBuffer;
-  //JsonObject& root = jsonBuffer.createObject();
-  //root["mac_address"] = MAC_char;
-  //root["namadevice"] =devicename;
-  //root.printTo(pubmsg);
-  //Serial.println(pubmsg);
-  //Serial.println(MAC_char);
-  //client.publish(routingkey2,pubmsg.c_str());
-  //delay(3000);
-  //}
+}
 
 
-
-
-
-void writeString(char add,String data){
+void writeString(char add, String data) {
   int _size = data.length();
   int i;
-  for(i=0;i<_size;i++)
+  for (i = 0; i < _size; i++)
   {
-    EEPROM.write(add+i,data[i]);
+    EEPROM.write(add + i, data[i]);
   }
-  EEPROM.write(add+_size,'\0');   
+  EEPROM.write(add + _size, '\0');
   EEPROM.commit();
 }
- 
- 
-String read_String(char add){
+
+
+String read_String(char add) {
   int i;
-  char data[100]; 
-  int len=0;
+  char data[100];
+  int len = 0;
   unsigned char k;
-  k=EEPROM.read(add);
-  while(k != '\0' && len<500){    
-    k=EEPROM.read(add+len);
-    data[len]=k;
+  k = EEPROM.read(add);
+  while (k != '\0' && len < 500) {
+    k = EEPROM.read(add + len);
+    data[len] = k;
     len++;
   }
-  data[len]='\0';
+  data[len] = '\0';
   return String(data);
 }
 
@@ -296,8 +331,8 @@ void aktivasi(char * topic, byte * payload, unsigned int length) {
   Serial.print(topic);
   Serial.println("] ");
   for (int i = 0; i < length; i++) {
-      pesan = (char)payload[i];
-      Serial.print(pesan);
-      writeString(10,pesan);   
+    pesan = (char)payload[i];
+    Serial.print(pesan);
+    writeString(10, pesan);
   }
 }
