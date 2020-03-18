@@ -11,41 +11,40 @@
    <ESP8266WiFi.h> 1.0.0
    <DNSServer.h> 1.1.0
    <ESP8266WebServer.h> 1.0.0
-   <WiFiManager.h> 0.12.0
+   <WiFiManager.h> 0.12.0i
    <ArduinoJson.h> 5.13.2
    <PubSubClient.h> 2.6.0
 */
+
+/*
+ * Librarry
+ */
 #include <FS.h> //this needs to be first, or it all crashes and burns...
 #include <Ticker.h>
-
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
-
-
-//#include <SPI.h>
-//#include "MFRC522.h"
 #include <PubSubClient.h>
 #include "config.h"
 #include <EEPROM.h>
+/////////////////////////////////////////////////////////
+
+
+/*
+   Initiate Variable
+*/
 StaticJsonBuffer<200> jsonBuffer;
 void writeString(char add, String data);
 String read_String(char add);
-//const char* id_user,aktif;
-
-//var temp untuk menampung data json dari payload
+int loop_count  = 0 ; //loop count loop watchdog
 char payloadTemp[200];
-
-//var untuk PIN sensor
 int soilSensor = A0;
 int powerPin = 15;
-
-//char devicename[40]="";
+String  recivedData;
 char registerstatus[40] = "";
 char aktivasistatus[40] = "";
-//var untuk userID
 char routingkey2[40] = "feedback_device";
 int relay1 = D1 ;
 int relay2 = D2 ;
@@ -55,6 +54,12 @@ int relay5 = D5 ;
 int relay6 = D6 ;
 int relay7 = D7 ;
 int relay8 = D8 ;
+///////////////////////////////////////////////////////////////////////////////
+
+
+/*
+   Setup wifi
+*/
 void setup_wifi() {
   WiFi.macAddress(MAC_array);
   for (int i = 0; i < sizeof(MAC_array) - 1; ++i) {
@@ -87,9 +92,12 @@ void setup_wifi() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
+///////////////////////////////////////////////////////////////////////////////
 
 
-
+/*
+ * Callback from MQTT
+ */
 void callback(char * topic, byte * payload, unsigned int length) {
   char message [7] ;
   Serial.print("Message arrived [");
@@ -143,9 +151,6 @@ void callback(char * topic, byte * payload, unsigned int length) {
     Serial.println("relay 4 idup");
     //    publish_ulang();
   }
-
-
-
 
   //relay 5
   if (message[4] == '1') {
@@ -204,8 +209,13 @@ void callback(char * topic, byte * payload, unsigned int length) {
   } else {
     Serial.println("0");
   }
-
 }
+
+/////////////////////////////////////////////////////////////////////
+
+/*
+ * Reconnect wifi and MQTT
+ */
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -230,6 +240,12 @@ void reconnect() {
   }
 }
 
+/////////////////////////////////////////////////////////
+
+
+/*
+ * Setup pin mode, serial,ETC
+ */
 void setup() {
   //setup pin mode
   //  pinMode(soilSensor, INPUT_PULLUP);
@@ -242,7 +258,7 @@ void setup() {
   pinMode(D7, OUTPUT);
   pinMode(D8, OUTPUT);
   pinMode(powerPin, OUTPUT);
-    digitalWrite(D1, HIGH);
+  digitalWrite(D1, HIGH);
   digitalWrite(D2, HIGH);
   digitalWrite(D3, HIGH);
   digitalWrite(D4, HIGH);
@@ -255,12 +271,15 @@ void setup() {
   SaveConfigFile();
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(aktivasi);
-
-
 }
+////////////////////////////////////////////////////////
+
+/*
+ * Loop main
+ */
 
 void loop() {
-  String  recivedData = read_String(10);
+  recivedData = read_String(10);
   Serial.println("Ini datanya:");
   Serial.println(recivedData);
   delay(1000);
@@ -277,8 +296,12 @@ void loop() {
     reconnect();
   }
 }
+/////////////////////////////////////////////////////////
 
 
+/*
+ * Publish message feedback from device
+ */
 void publish_ulang () {
 
   //const char tambahan=MAC_char,"Ast";
@@ -296,8 +319,12 @@ void publish_ulang () {
   //client.publish(tambahan());
   delay(3000);
 }
+/////////////////////////////////////////////////////////
 
 
+/*
+ * Write data ke ROM device
+ */
 void writeString(char add, String data) {
   int _size = data.length();
   int i;
@@ -308,8 +335,12 @@ void writeString(char add, String data) {
   EEPROM.write(add + _size, '\0');
   EEPROM.commit();
 }
+///////////////////////////////////////////
 
 
+/*
+ * Read data dari ROM device
+ */
 String read_String(char add) {
   int i;
   char data[100];
@@ -324,7 +355,11 @@ String read_String(char add) {
   data[len] = '\0';
   return String(data);
 }
+///////////////////////////////////////////
 
+/*
+ * Aktivasi device
+ */
 void aktivasi(char * topic, byte * payload, unsigned int length) {
   String pesan;
   Serial.print("Message arrived [");
@@ -336,3 +371,4 @@ void aktivasi(char * topic, byte * payload, unsigned int length) {
     writeString(10, pesan);
   }
 }
+///////////////////////////////////////////
