@@ -23,9 +23,7 @@ int relay5 = D5 ;
 int relay6 = D6 ;
 int relay7 = D7 ;
 int relay8 = D8 ;
-String waktu;
 char message [100] ;
-char dataTimer[100];
 
 
 
@@ -89,21 +87,7 @@ void publish_ulang () {
   //client.publish(tambahan());
 }
 
-//untuk separator (,)
-String getValue(String data, char separator, int index) {
-  int found = 0;
-  int strIndex[] = {0, -1};
-  int maxIndex = data.length() - 1;
 
-  for (int i = 0; i <= maxIndex && found <= index; i++) {
-    if (data.charAt(i) == separator || i == maxIndex) {
-      found++;
-      strIndex[0] = strIndex[1] + 1;
-      strIndex[1] = (i == maxIndex) ? i + 1 : i;
-    }
-  }
-  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
-}
 
 /*
    Callback from MQTT
@@ -116,19 +100,7 @@ void callback(char * topic, byte * payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     message[i] = (char)payload[i];
   }
-
   
-  for (int j = 9; j <length;j++){
-   dataTimer[j] = (char)payload[j];
-  }
-  char c= "#";
-  char a = dataTimer;
-
-  
-
-//  String data = convertMsg.substring(5);
-//  int timer = data.toInt();
-//  //relay 1
 
   if (message[0] == '1') {
     digitalWrite(relay1, HIGH);
@@ -232,19 +204,7 @@ void callback(char * topic, byte * payload, unsigned int length) {
     Serial.println("relay 8 off");
     statusDevice[7] = "0";
   }
-//
-//  if (timer < 0 ) {
-//    delay (timer);
-//    digitalWrite(relay1, LOW);
-//    digitalWrite(relay2, LOW);
-//    digitalWrite(relay3, LOW);
-//    digitalWrite(relay4, LOW);
-//    digitalWrite(relay5, LOW);
-//    digitalWrite(relay6, LOW);
-//    digitalWrite(relay7, LOW);
-//    digitalWrite(relay8, LOW);
-//    Serial.println("relay mati");
-//  }
+
   publish_ulang();
 
   delay(50);
